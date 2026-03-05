@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOC Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="./logo.ico" type="image/x-icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, #020617, #0b1225, #020617);
+            color: #e2e8f0;
+            padding: 28px;
+        }
+
+        /* ================= BASE CARDS ================= */
+
+        .card,
+        .chamado-card,
+        .chamado-card-atenuação,
+        .chamado-card-massivo,
+        .info-card {
+
+            background: linear-gradient(180deg, #020617, #020617ee);
+
+            border-radius: 14px;
+            padding: 20px;
+
+            border: 2px solid rgba(56, 189, 248, 0.15);
+
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+
+            transition: all 0.25s ease;
+        }
+
+        .card:hover,
+        .chamado-card:hover,
+        .chamado-card-atenuação:hover,
+        .chamado-card-massivo:hover,
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        /* ================= TEXTOS ================= */
+
+        h2 {
+            font-size: 30px;
+            font-weight: 900;
+            margin-bottom: 28px;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3 {
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #cbd5f5;
+        }
+
+        .card h3,
+        .info-card h4,
+        .chamado-card h4,
+        .chamado-card-atenuação h4,
+        .chamado-card-massivo h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .card span {
+            font-size: 44px;
+            font-weight: 900;
+            color: #38bdf8;
+        }
+
+        .chamado-card span,
+        .info-card span,
+        .chamado-card-atenuação span,
+        .chamado-card-massivo span {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* ================= GRIDS ================= */
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+            margin-bottom: 35px;
+        }
+
+        .chamados {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .section {
+            margin-bottom: 45px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ================= STATUS GLOBAL ================= */
+
+        .status-verde {
+            color: #22c55e;
+
+        }
+
+        .status-amarelo {
+            border-color: #facc15 !important;
+            color: #facc15;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+        }
+
+        @keyframes alertaVermelho {
+            0% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(239, 68, 68, 1);
+            }
+
+            100% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .status-vermelho {
+            border-color: #ef4444 !important;
+            color: #ef4444;
+            animation: alertaVermelho 1s infinite;
+        }
+
+        /* ================= CATEGORIAS ================= */
+
+        .alta span {
+            color: #ef4444;
+        }
+
+        .media span {
+            color: #facc15;
+        }
+
+        .baixa span {
+            color: #22c55e;
+        }
+
+        .vendas {
+            border-left: 4px solid #22c55e;
+        }
+
+
+        .cancelamento {
+            border-left: 4px solid #ef4444;
+        }
+
+        .almox {
+            border-left: 4px solid #38bdf8;
+        }
+
+        /* ================= TV ================= */
+
+        @media (min-width:1600px) {
+
+            body {
+                zoom: 1.12;
+            }
+
+            .card span {
+                font-size: 52px;
+            }
+
+            .chamado-card span,
+            .info-card span {
+                font-size: 34px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div style="display: flex;  ">
+        <h2><i class="fa-solid fa-satellite-dish"></i> Painel NOC</h2>
+    </div>
+    <div class="metrics">
+        <div class="card">
+            <h3>Total de Clientes</h3>
+            <span class="number-clie">0</span>
+        </div>
+        <div class="card">
+            <h3>Clientes Ativos</h3>
+            <span class="total-cliente-ativo">0</span>
+        </div>
+        <div class="card">
+            <h3>Técnicos Ativos</h3>
+            <span class="number-tec">0</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3><i class="fa-solid fa-sensor-triangle-exclamation"></i> Chamados NOC</h3>
+        <div class="chamados">
+            <div class="chamado-card">
+                <h4> Suporte Técnico</h4>
+                <span class="suporte-tec">0</span>
+
+            </div>
+            <div class="chamado-card">
+                <h4> Suporte N1</h4>
+                <span class="suporte-n1">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Suporte N2</h4>
+                <span class="suporte-n2">0</span>
+            </div>
+
+            <div class="chamado-card">
+                <h4>Suporte N3</h4>
+                <span class="suporte-n3">0</span>
+            </div>
+
+            <div class="chamado-card baixa">
+                <h4 class="">Baixa</h4>
+                <span class="suporte-baixa">0</span>
+            </div>
+
+            <div class="chamado-card media">
+                <h4 class="">Regular</h4>
+                <span class="suporte-media">0</span>
+            </div>
+
+            <div class="chamado-card alta">
+                <h4>Alta</h4>
+                <span class="suporte-alta">0</span>
+            </div>
+
+        </div>
+
+        <div class="chamados">
+            <div class="chamado-card">
+                <h4>Offline</h4>
+                <span class="suporte-offline">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Roteador</h4>
+                <span class="suporte-roteador">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Atenuação</h4>
+                <span class="suporte-atenuacao">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Retirada de Equipamento</h4>
+                <span class="suporte-retira-equipamento">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Retirada de Equipamento Suspensos</h4>
+                <span class="suporte-retira-equipamento-suspenso">0</span>
+            </div>
+
+            <div class="chamado-card">
+                <h4>Instalação</h4>
+                <span class="suporte-instalacao">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Mudança de Endereço</h4>
+                <span class="suporte-mudanca-endereco">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Mudança de Ponto interno</h4>
+                <span class="suporte-mudanca-ponto-interno">0</span>
+            </div>
+        </div>
+        <h3><i class="fa-solid fa-headset"></i> Massivos</h3>
+        <div class="chamados">
+            <div class="chamado-card-massivo">
+                <h4>Backbone Gpon MRT</h4>
+                <span class="suporte-backbone-mrt">0</span>
+            </div>
+            <div class="chamado-card-massivo">
+                <h4>Backbone Gpon DAS</h4>
+                <span class="suporte-backbone-das">0</span>
+            </div>
+            <div class="chamado-card-massivo">
+                <h4>Backbone Gpon SRP</h4>
+                <span class="suporte-backbone-srp">0</span>
+            </div>
+            <div class="chamado-card-massivo">
+                <h4>Backbone Gpon PV</h4>
+                <span class="suporte-backbone-pv">0</span>
+            </div>
+            <div class="chamado-card-massivo">
+                <h4>Backbone Gpon LRJ</h4>
+                <span class="suporte-backbone-lrj">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3><i class="fa-solid fa-cart-shopping"></i> Comercial & Financeiro</h3>
+
+        <div class="chamados">
+            <div class="chamado-card">
+                <h4>Vendas</h4>
+                <span class="total-vendas">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Comercial Contratação</h4>
+                <span class="venda-contratacao">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Comercial Pedente DOC</h4>
+                <span class="venda-pendente-doc">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Financeiro</h4>
+                <span class="financeiro">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Cancelamentos</h4>
+                <span class="financeiro-cancelamento">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Retenção</h4>
+                <span class="financeiro-retencao">0</span>
+            </div>
+        </div>
+        <div class="chamados">
+            <div class="chamado-card">
+                <h4>Acordo Negociacao</h4>
+                <span class="financeiro-acordo">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Congelamento</h4>
+                <span class="financeiro-congelamento">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Procon</h4>
+                <span class="financeiro-procon">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Anatel</h4>
+                <span class="financeiro-anatel">0</span>
+            </div>
+            <div class="chamado-card">
+                <h4>Reclame aqui</h4>
+                <span class="financeiro-reclame-aqui">0</span>
+            </div>
+
+        </div>
+    </div>
+    <div class="section">
+        <h3><i class="fa-solid fa-warehouse"></i> Almoxarifado</h3>
+
+        <div class="section-grid">
+            <div class="info-card almox">
+                <h4>Almoxarifado</h4>
+                <span class="almoxarifado">0</span>
+            </div>
+            <div class="info-card almox">
+                <h4>Fornecedores</h4>
+                <span class="number-for">0</span>
+            </div>
+
+            <div class="info-card almox">
+                <h4>Itens em Estoque</h4>
+                <span class="total-itens">0</span>
+            </div>
+
+            <div class="info-card almox">
+                <h4>Equipamentos Críticos</h4>
+                <span class="itens-criticos">0</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <script>
+
+        /* ==============================
+           ELEMENTOS STATUS GLOBAL
+        ============================== */
+
+        const statusBar = document.createElement("div");
+        statusBar.style.marginBottom = "20px";
+        statusBar.style.fontSize = "18px";
+        statusBar.style.fontWeight = "700";
+
+        statusBar.innerHTML = `
+<span id="statusRede">🟢 Rede Operacional</span> |
+<span id="statusSocket">🟢 Servidor conectado</span> |
+<span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
+`;
+
+        document.body.insertBefore(statusBar, document.body.children[1]);
+
+        const statusRede = document.getElementById("statusRede");
+        const statusSocket = document.getElementById("statusSocket");
+        const lastUpdate = document.getElementById("lastUpdate");
+
+        /* ==============================
+           SOCKET
+        ============================== */
+
+        const socket = io("http://192.168.1.132:5000");
+
+        socket.on("connect", () => {
+            console.log("🟢 Conectado");
+            statusSocket.innerText = "🟢 Servidor conectado";
+        });
+
+        socket.on("disconnect", () => {
+            console.log("🔴 Desconectado");
+            statusSocket.innerText = "🔴 Servidor desconectado";
+        });
+
+        /* ==============================
+           CLIENTES
+        ============================== */
+
+        socket.on("clientes", data => {
+            document.querySelector(".total-cliente-ativo").innerText = data.total;
+        });
+
+        /* ==============================
+           UPDATE PRINCIPAL
+        ============================== */
+
+        let valoresAnteriores = {};
+
+        socket.on("update", data => {
+
+            atualizarUI(data.grupos);
+
+            lastUpdate.innerText =
+                new Date().toLocaleTimeString();
+
+        });
+
+        /* ==============================
+           MAPA DE CAMPOS
+        ============================== */
+
+        const map = {
+            "SUPORTE TÉCNICO": ".suporte-tec",
+            "SUPORTE N1": ".suporte-n1",
+            "SUPORTE N2": ".suporte-n2",
+            "SUPORTE N3": ".suporte-n3",
+            "BAIXA": ".suporte-baixa",
+            "REGULAR": ".suporte-media",
+            "ALTA": ".suporte-alta",
+            "OFFLINE": ".suporte-offline",
+            "ATENUAÇÃO": ".suporte-atenuacao",
+            "ROTEADOR": ".suporte-roteador",
+            "RETIRADA DE EQUIPAMENTO": ".suporte-retira-equipamento",
+            "RETIRADA DE EQUIPAMENTO - SUSPENSOS": ".suporte-retira-equipamento-suspenso",
+            "ATIVAÇÃO DE CONTRATO - COMUM": ".suporte-instalacao",
+            "MUDANÇA DE PONTO INTERNO": ".suporte-mudanca-ponto-interno",
+            "ATIVAÇÃO DE CONTRATO - MUDANÇA DE ENDEREÇO": ".suporte-mudanca-endereco",
+            "BACKBONE GPON ACESSANET | DAS": ".suporte-backbone-das",
+            "BACKBONE GPON ACESSANET | LRJ": ".suporte-backbone-lrj",
+            "BACKBONE GPON ACESSANET | MRT": ".suporte-backbone-mrt",
+            "BACKBONE GPON ACESSANET | PV": ".suporte-backbone-pv",
+            "BACKBONE GPON ACESSANET | SRP": ".suporte-backbone-srp",
+            "COMERCIAL CONTRATAÇÃO": ".venda-contratacao",
+            "COMERCIAL PENDENTE DOC": ".venda-pendente-doc",
+            "FINANCEIRO": ".financeiro",
+            "CANCELAMENTO CONTRATO": ".financeiro-cancelamento",
+            "RETENÇÃO": ".financeiro-retencao",
+            "ANATEL": ".financeiro-anatel",
+            "ACORDO/ NEGOCIAÇÃO": ".financeiro-acordo",
+            "PROCON": ".financeiro-procon",
+            "RECLAME AQUI": ".financeiro-reclame-aqui",
+            "CONGELAMENTO": ".financeiro-congelamento",
+            "ALMOXARIFADO": ".almoxarifado",
+        };
+
+        /* ==============================
+           ATUALIZA UI
+        ============================== */
+
+        function atualizarUI(grupos) {
+
+            let totalOffline = grupos["OFFLINE"] || 0;
+
+            let totalMassivo =
+                (grupos["BACKBONE GPON ACESSANET | DAS"] || 0) +
+                (grupos["BACKBONE GPON ACESSANET | MRT"] || 0) +
+                (grupos["BACKBONE GPON ACESSANET | SRP"] || 0);
+
+            /* Atualiza números */
+
+            for (const tipo in map) {
+
+                const el = document.querySelector(map[tipo]);
+
+                if (!el) continue;
+
+                const novoValor = grupos[tipo] || 0;
+
+                /* anima mudança */
+                if (valoresAnteriores[tipo] !== novoValor) {
+                    el.style.transform = "scale(1.25)";
+                    setTimeout(() => el.style.transform = "scale(1)", 250);
+                }
+
+                el.textContent = novoValor;
+                valoresAnteriores[tipo] = novoValor;
+            }
+
+            /* ==========================
+               STATUS GLOBAL DA REDE
+            ========================== */
+
+            if (totalMassivo > 5 || totalOffline > 60) {
+
+                statusRede.innerText = "🔴 MASSIVO DETECTADO";
+                statusRede.style.color = "#ef4444";
+
+            } else if (totalOffline > 25) {
+
+                statusRede.innerText = "🟡 Instabilidade detectada";
+                statusRede.style.color = "#facc15";
+
+            } else {
+
+                statusRede.innerText = "🟢 Rede Operacional";
+                statusRede.style.color = "#22c55e";
+            }
+
+            aplicarCoresCards();
+        }
+
+        /* ==============================
+           CORES AUTOMÁTICAS
+        ============================== */
+
+        function aplicarCoresCards() {
+
+            document
+                .querySelectorAll('.card,.chamado-card,.chamado-card-massivo,.info-card')
+                .forEach(card => {
+
+                    const span = card.querySelector('span');
+                    if (!span) return;
+
+                    const valor = parseInt(span.textContent) || 0;
+
+                    card.classList.remove(
+                        'status-verde',
+                        'status-amarelo',
+                        'status-vermelho'
+                    );
+                    if (valor > 30) {
+                        card.classList.add('status-vermelho');
+                    }
+                    else if (valor >= 20) {
+                        card.classList.add('status-amarelo');
+                    }
+                    else {
+                        card.classList.add('status-verde');
+                    }
+                });
+        }
+
+    </script>
+
+</body>
+
+</html>
